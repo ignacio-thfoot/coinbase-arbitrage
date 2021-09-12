@@ -19,12 +19,17 @@ const minLimit = (ml) => {
 };
 
 socket.on('ARBITRAGE', (pl) => {
-  console.log(pl);
+  if(pl.length > 0) console.log(pl);
   if (runFlag) {
     let markup = '';
     pl.filter((p) => p.value >= mimPL).forEach((d, i) => {
-      markup +=
-        "<tr class='table-success'><td>" +
+      if(parseFloat(d.value) > 0.2) {
+        markup += "<tr class='table-success'>";
+      } else {
+        markup += "<tr class='table-normal'>";
+      }
+      markup += 
+        "<td>" +
         (i + 1) +
         '</td><td>'+
         d.d1 + ' - ' + d.d2 + ' - ' + d.d3 +

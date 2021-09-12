@@ -18,7 +18,7 @@ const eventEmitter = new events();
 
 let pairs = [], symValJ = {};
 
-const coins = ['ADA', 'BTC', 'ETH', 'EUR', 'USDT'];
+const coins = ['ADA', 'BTC', 'ETH', 'DOT', 'SOL','MATIC', 'USDT'];
 
 const getPairs = () => {
     authedClient.getProducts()
@@ -119,7 +119,9 @@ const processData = async (data) => {
             if (data['result'] === null) return;
             
             if(data.type == 'ticker') {
-                
+
+                //console.log(data);
+
                 symValJ[data.product_id].bidPrice = parseFloat(data.best_bid);
                 symValJ[data.product_id].askPrice = parseFloat(data.best_ask);
                 
@@ -131,145 +133,182 @@ const processData = async (data) => {
                         symValJ[d.lv2]['bidPrice'] &&
                         symValJ[d.lv3]['bidPrice']
                     ) {
-                    //Level 1 calculation
-                    let lv_calc, lv_str;
-                    if (d.l1 === 'num') {
-                        lv_calc = symValJ[d.lv1]['bidPrice'];
-                        lv_str =
-                        d.d1 +
-                        '->' +
-                        d.lv1 +
-                        "['bidP']['" +
-                        symValJ[d.lv1]['bidPrice'] +
-                        "']" +
-                        '->' +
-                        d.d2 +
-                        '<br/>';
-                    } else {
-                        lv_calc = 1 / symValJ[d.lv1]['askPrice'];
-                        lv_str =
-                        d.d1 +
-                        '->' +
-                        d.lv1 +
-                        "['askP']['" +
-                        symValJ[d.lv1]['askPrice'] +
-                        "']" +
-                        '->' +
-                        d.d2 +
-                        '<br/>';
-                    }
+                        //Level 1 calculation
+                        let lv_calc, lv_str;
+                        if (d.l1 === 'num') {
+                            lv_calc = symValJ[d.lv1]['bidPrice'];
+                            lv_str =
+                            d.d1 +
+                            '->' +
+                            d.lv1 +
+                            "['bidP']['" +
+                            symValJ[d.lv1]['bidPrice'] +
+                            "']" +
+                            '->' +
+                            d.d2 +
+                            '<br/>';
+                        } else {
+                            lv_calc = 1 / symValJ[d.lv1]['askPrice'];
+                            lv_str =
+                            d.d1 +
+                            '->' +
+                            d.lv1 +
+                            "['askP']['" +
+                            symValJ[d.lv1]['askPrice'] +
+                            "']" +
+                            '->' +
+                            d.d2 +
+                            '<br/>';
+                        }
 
-                    //Level 2 calculation
-                    if (d.l2 === 'num') {
-                        lv_calc *= symValJ[d.lv2]['bidPrice'];
-                        lv_str +=
-                        d.d2 +
-                        '->' +
-                        d.lv2 +
-                        "['bidP']['" +
-                        symValJ[d.lv2]['bidPrice'] +
-                        "']" +
-                        '->' +
-                        d.d3 +
-                        '<br/>';
-                    } else {
-                        lv_calc *= 1 / symValJ[d.lv2]['askPrice'];
-                        lv_str +=
-                        d.d2 +
-                        '->' +
-                        d.lv2 +
-                        "['askP']['" +
-                        symValJ[d.lv2]['askPrice'] +
-                        "']" +
-                        '->' +
-                        d.d3 +
-                        '<br/>';
-                    }
+                        //Level 2 calculation
+                        if (d.l2 === 'num') {
+                            lv_calc *= symValJ[d.lv2]['bidPrice'];
+                            lv_str +=
+                            d.d2 +
+                            '->' +
+                            d.lv2 +
+                            "['bidP']['" +
+                            symValJ[d.lv2]['bidPrice'] +
+                            "']" +
+                            '->' +
+                            d.d3 +
+                            '<br/>';
+                        } else {
+                            lv_calc *= 1 / symValJ[d.lv2]['askPrice'];
+                            lv_str +=
+                            d.d2 +
+                            '->' +
+                            d.lv2 +
+                            "['askP']['" +
+                            symValJ[d.lv2]['askPrice'] +
+                            "']" +
+                            '->' +
+                            d.d3 +
+                            '<br/>';
+                        }
 
-                    //Level 3 calculation
-                    if (d.l3 === 'num') {
-                        lv_calc *= symValJ[d.lv3]['bidPrice'];
-                        lv_str +=
-                        d.d3 +
-                        '->' +
-                        d.lv3 +
-                        "['bidP']['" +
-                        symValJ[d.lv3]['bidPrice'] +
-                        "']" +
-                        '->' +
-                        d.d1;
-                    } else {
-                        lv_calc *= 1 / symValJ[d.lv3]['askPrice'];
-                        lv_str +=
-                        d.d3 +
-                        '->' +
-                        d.lv3 +
-                        "['askP']['" +
-                        symValJ[d.lv3]['askPrice'] +
-                        "']" +
-                        '->' +
-                        d.d1;
-                    }
+                        //Level 3 calculation
+                        if (d.l3 === 'num') {
+                            lv_calc *= symValJ[d.lv3]['bidPrice'];
+                            lv_str +=
+                            d.d3 +
+                            '->' +
+                            d.lv3 +
+                            "['bidP']['" +
+                            symValJ[d.lv3]['bidPrice'] +
+                            "']" +
+                            '->' +
+                            d.d1;
+                        } else {
+                            lv_calc *= 1 / symValJ[d.lv3]['askPrice'];
+                            lv_str +=
+                            d.d3 +
+                            '->' +
+                            d.lv3 +
+                            "['askP']['" +
+                            symValJ[d.lv3]['askPrice'] +
+                            "']" +
+                            '->' +
+                            d.d1;
+                        }
 
-                    d.tpath = lv_str;
-                    d.value = parseFloat(parseFloat((lv_calc - 1) * 100).toFixed(3));
+                        d.tpath = lv_str;
+                        d.value = parseFloat(parseFloat((lv_calc - 1) * 100).toFixed(3));
                     }
                 });
             }
 
+            //console.log(pairs);
+            
+
             //Send Socket
             eventEmitter.emit(
             'ARBITRAGE',
-                sort(pairs.filter(d.d1 == 'EUR')).desc((u) => u.value)
+                sort(pairs.filter((d) => d.value > 0.01)).desc((u) => u.value)
             );
 
             pairs.forEach(async (pair) => {
-                if(pair.value > 0.2) {
-                    //console.log(pair);
+                if(pair.d1 == 'ADA' && pair.value > .2) {
                     isProcessing = true;
 
-                    let balances = authedClient.getAccounts((error, response, data) => {
+                    authedClient.getAccounts((error, response, data) => {
                         let baseBalance = parseFloat(data.filter(el => { return el.currency == pair.d1 })[0].balance);
                         
+                        let size = (parseFloat(parseFloat(baseBalance) / parseFloat(symValJ[pair.lv1]['askPrice'])).toFixed(4)) * 0.95;
                         let params = {
-                            side: 'sell',
-                            price: symValJ[pair.lv1]['bidPrice'],
-                            size: parseFloat(baseBalance),
+                            side: 'buy',
+                            price: symValJ[pair.lv1]['askPrice'],
+                            size: size,
                             product_id: pair.lv1,
                             type: 'limit',
                         };
-                        console.log("base balance", baseBalance);
                         console.log(`
-                        ${params.side} ${Math.floor(parseFloat(baseBalance) / parseFloat(symValJ[pair.lv1]['bidPrice']))} of ${pair.lv1} @ ${symValJ[pair.lv1]['askPrice']} ${pair.d2}
+                        Buy ${size} ${pair.d2} of ${pair.lv1} @ ${symValJ[pair.lv1]['askPrice']} ${pair.d1}
                         `);
 
-                        // authedClient.placeOrder(params, (error, response, order) => {
-                        //     if(error) {
-                        //         console.log(error.data.message);
-                        //     } else {
-                        //         console.log(order);
-                        //     }
-                        //     // let params = {
-                        //     //     side: 'buy',
-                        //     //     price: symValJ[pair.lv2]['bidPrice'], // USD
-                        //     //     size: order.size,
-                        //     //     product_id: pair.lv1,
-                        //     // };
-                        //     // console.log(`
-                        //     // Buy ${pair.lv2} @ ${symValJ[pair.lv2]['bidPrice']}.
-                        //     // 2- Buy ${pair.lv3} @ ${symValJ[pair.lv3]['bidPrice']}.
-                        //     // `);
+                        //place order for LV1
+                        authedClient.placeOrder(params, (error, response, order) => {
+                            if(error) {
+                                console.log(error.data.message);
+                                process.exit();
+                            } else {
+                                console.log(order);
+                            }
+
+                            let size = (parseFloat(parseFloat(order.size) / parseFloat(symValJ[pair.lv2]['askPrice'])) * 0.95).toFixed(4);
+                            let params2 = {
+                                side: 'buy',
+                                price: symValJ[pair.lv2]['askPrice'], // EUR
+                                size: size,
+                                product_id: pair.lv2,
+                                type: 'limit',
+                            };
+                            console.log(`
+                                Buy ${size} ${pair.lv2} @ ${symValJ[pair.lv2]['askPrice']}.
+                            `);
+
+                            //place order for LV2
+                            authedClient.placeOrder(params2, (error2, response2, order2) => {
+                                if(error2) {
+                                    console.log(error2.data.message);
+                                    process.exit();
+                                } else {
+                                    console.log(order2);
+                                }
+
+                                let size = (parseFloat(parseFloat(order2.size) / parseFloat(symValJ[pair.lv3]['bidPrice'])) * 0.95).toFixed(4);
+                                let params3 = {
+                                    side: 'buy',
+                                    price: symValJ[pair.lv3]['bidPrice'],
+                                    size: size,
+                                    product_id: pair.lv3,
+                                    type: 'limit',
+                                };
 
 
+                                console.log(`
+                                Buy ${size} ${pair.lv3} @ ${symValJ[pair.lv3]['bidPrice']}.
+                                `);
 
-                        //     // console.log(`
-                        //     // Buy ${pair.lv3} @ ${symValJ[pair.lv3]['bidPrice']}.
-                        //     // `);
+                                //Place order for LV3
+                                authedClient.placeOrder(params3, (error3, response3, order3) => {
+                                    if(error3) {
+                                        console.log(error3.data.message);
+                                        process.exit();
+                                    } else {
+                                        console.log(order3);
+                                    }
 
-                        //     isProcessing = false;
+                                    isProcessing = false;
 
-                        //     process.exit();
-                        // });
+                                    process.exit();
+
+                                });
+                                
+                            });
+                            
+                        });
                     });
                 }
             });

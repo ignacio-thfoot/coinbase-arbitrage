@@ -3,6 +3,7 @@ const socket = require('socket.io');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const open = require('open');
 
 const app = express();
 const server = app.listen(3000, () =>
@@ -29,3 +30,6 @@ arbitrage_coinbase.eventEmitter.on('ARBITRAGE', (pl) => {
 });
 
 initialize();
+
+//start server
+open('http://localhost:3000');
